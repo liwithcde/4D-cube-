@@ -1,6 +1,8 @@
 '''
 this code is not good
 2022.4.
+增加了用鼠标左键控制平移的操作方式 -2022.5.x
+
 '''
 
 
@@ -117,68 +119,88 @@ class cube(shape):
                 self.lines = np.append(self.lines, np.array([[temp,point]])).reshape(-1,2,4)
 
 
+#plane是一个平面，用两个四维向量表示，平面平行于这两个四维向量
+viewPlane = np.array([[1, 0, 0, 0], [0, 1, 0, 0]], dtype='float')
+# 平面的位置，不重要
+pos=[0,0]
 cube0 = cube(100,[[50,50,50,50]],4)
 cube1 = cube(sideLength=200, dimension=3)
 cube0.lineColor = (255,0,255)
 cube1.planeColor=(0,255,255)
-
-#plane是一个平面，用两个四维向量表示，平面平行于这两个四维向量
-viewPlane = np.array([[1, 0, 0, 0], [0, 1, 0, 0]], dtype='float')
-print('init plane: ', viewPlane)
-
 #pygame框架，不重要
 pygame.init()
 screen=pygame.display.set_mode((1000,600)) #
 pygame.display.set_caption("4D显示")
 fClock = pygame.time.Clock()
-
-# 平面的位置，不重要
-pos=[0,0]
-
 #主循环：
 #控制平面移动时，平面移动的速度
 movespeed = 8
-print(cube0.planes)
-while True:
-    #按键反应，方向键控制平面移动，数字键0123的两两组合控制平面旋转。shift控制是否反向旋转
-    rotalist=[]
-    if pygame.key.get_pressed()[pygame.K_UP]:
-        pos[1] -= movespeed
-    if pygame.key.get_pressed()[pygame.K_DOWN]:
-        pos[1] += movespeed
-    if pygame.key.get_pressed()[pygame.K_RIGHT]:
-        pos[0] += movespeed
-    if pygame.key.get_pressed()[pygame.K_LEFT]:
-        pos[0] -= movespeed
-    if pygame.key.get_pressed()[pygame.K_1]:
-        rotalist.append(0)
-    if pygame.key.get_pressed()[pygame.K_2]:
-        rotalist.append(1)
-    if pygame.key.get_pressed()[pygame.K_3]:
-        rotalist.append(2)
-    if pygame.key.get_pressed()[pygame.K_4]:
-        rotalist.append(3)
-    if len(rotalist) == 2:
-        viewPlane=rotate(rotalist, viewPlane)
+# print(cube0.planes)
 
-    # 不重要
-    screen.fill(pygame.Color('black'))
+def main():
+    global viewPlane
+    global pos 
+    global cube0,cube1
+    global screen,fClock
+    global movespeed
 
+    mousePressed = False
 
+    while True:
+        #按键反应，方向键控制平面移动，数字键0123的两两组合控制平面旋转。shift控制是否反向旋转
+        rotalist=[]
+        if pygame.key.get_pressed()[pygame.K_UP]:
+            pos[1] -= movespeed
+        if pygame.key.get_pressed()[pygame.K_DOWN]:
+            pos[1] += movespeed
+        if pygame.key.get_pressed()[pygame.K_RIGHT]:
+            pos[0] += movespeed
+        if pygame.key.get_pressed()[pygame.K_LEFT]:
+            pos[0] -= movespeed
 
-    # 在屏幕上绘制线
-    cube1.draw_shape()
-    cube0.draw_shape()
+        # 鼠标左键控制移动    
+        if mousePressed:
+            rel = pygame.mouse.get_rel()
+            pos[0]+=rel[0]
+            pos[1]+=rel[1]
+        if pygame.key.get_pressed()[pygame.K_1]:
+            rotalist.append(0)
+        if pygame.key.get_pressed()[pygame.K_2]:
+            rotalist.append(1)
+        if pygame.key.get_pressed()[pygame.K_3]:
+            rotalist.append(2)
+        if pygame.key.get_pressed()[pygame.K_4]:
+            rotalist.append(3)
+        if len(rotalist) == 2:
+            viewPlane=rotate(rotalist, viewPlane)
 
-    #不重要
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-    pygame.display.update()
-    pygame.display.set_caption("4D显示"+str(list((map(lambda x:list(map(lambda \
-                x:round(x,2),x)),viewPlane)))))    #后面一长串是显示平面的转角，以标题栏能装下的方式
+        # 不重要
+        screen.fill(pygame.Color('black'))
 
-    # 控制帧率
-    fClock.tick(16)
+        # 在屏幕上绘制线
+        cube1.draw_shape()
+        cube0.draw_shape()
+
+        #不重要
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+            # 鼠标左键控制移动
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                rel = pygame.mouse.get_rel()
+                mousePressed = True
+            if event.type == pygame.MOUSEBUTTONUP:
+                mousePressed = False
+
+        pygame.display.update()
+        pygame.display.set_caption("4D显示"+str(list((map(lambda x:list(map(lambda \
+                    x:round(x,2),x)),viewPlane)))))    #后面一长串是显示平面的转角，以标题栏能装下的方式
+
+        # 控制帧率
+        fClock.tick(16)
+
+if __name__ == '__main__':
+    main()
 
 
