@@ -5,3 +5,4 @@
 按键盘上的1234数字键中的两个，使整体朝某个角度旋转（4维空间旋转有6个方向）。如果同时按着shift就反向旋转。
 
 press shift 、 1 、2、3、4 、arrow  keys to see how it work
+![image](https://user-images.githubusercontent.com/103040347/202863788-14f89bab-0b76-4fef-8898-dfb2ef40f04a.png)
